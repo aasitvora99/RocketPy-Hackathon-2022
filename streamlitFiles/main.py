@@ -1,10 +1,24 @@
 import streamlit as st
+from pages import home
+from pages import addEnvironment
+from pages import addMotor
+from pages import addRocket
+from pages import Results
 
-header = st.container()
-dataset = st.container()
-features = st.container()
-model_training = st.container()
-with header:
-    st.title("RocketPy")
-    #st.markdown("[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)[![Open in Colab](https://colab.research.google.com/github/giovaniceotto/rocketpy/blob/master/docs/notebooks/getting_started_colab.ipynb)](https://colab.research.google.com/github/giovaniceotto/rocketpy/blob/master/docs/notebooks/getting_started_colab.ipynb)")
-    st.header("Detailed instructions to be added later")
+landing = st.container()
+
+# Adding Navigation Pages
+with landing:
+    PAGES = {
+        "Home Page": home,
+        "Add Environment": addEnvironment,
+        "Add Motor": addMotor,
+        "Design Rocket": addRocket,
+        "Results": Results,
+    }
+
+    st.sidebar.title("RocketPy")
+
+    selection = st.sidebar.radio("Go to", list(PAGES.keys()))
+    page = PAGES[selection]
+    page.app()
