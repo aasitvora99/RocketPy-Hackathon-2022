@@ -4,7 +4,9 @@ from pages import addEnvironment
 from pages import addMotor
 from pages import addRocket
 from pages import Results
+import os
 
+# os.chdir('../docs/notebooks')
 landing = st.container()
 
 # Adding Navigation Pages
