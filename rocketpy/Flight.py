@@ -3183,7 +3183,7 @@ class Flight:
         shearModulus : float
             Shear Modulus of fins' material, must be given in Pascal
         altMaxV : float
-            Altitude at max Velocity of the rocket, must be in feet
+            Altitude at maximum velocity of flight, in feet
 
         Return
         ------
@@ -3196,15 +3196,14 @@ class Flight:
         s = (self.rocket.tipChord + self.rocket.rootChord) * self.rocket.span / 2
         ar = self.rocket.span * self.rocket.span / s
         la = self.rocket.tipChord / self.rocket.rootChord
-        T = 59 - 0.00356(altMaxV)
-        tempPressureforFlutter = (
-            (2116 / 144) * ((T + 459.7) / 518.6) ** 5.256
+        T = 59 - (0.0356 * altMaxV)
+        self.pressure = (self.pressure * 0) + (
+            2116 * ((T + 459.7) / 518.6) ** 5.256
         ) * 6894.7572931783
-
         # Calculate the Fin Flutter Mach Number
         self.flutterMachNumber = (
             (shearModulus * 2 * (ar + 2) * (finThickness / self.rocket.rootChord) ** 3)
-            / (1.337 * (ar ** 3) * (la + 1) * tempPressureforFlutter)
+            / (1.337 * (ar ** 3) * (la + 1) * self.pressure)
         ) ** 0.5
 
         # Calculate difference between Fin Flutter Mach Number and the Rocket Speed
