@@ -5,14 +5,14 @@ import pandas as pd
 from rocketpy import Environment
 import datetime
 from datetime import timezone
+import pandas as pd
 matplotlib.use('tkagg')
 # for notebook commands, find streamlit alternative
 # %config InlineBackend.figure_formats = ['svg']
 # %matplotlib inline
 
-st.cache()
 
-
+# @st.cache(suppress_st_warning=True)
 def app():
     railLength = st.number_input("What's the size of Launch Rail?")
     latitude = st.number_input("Latitude of the place you're launching",
@@ -44,7 +44,7 @@ def app():
     # Hour given in UTC time
     Env.setDate((wenHop.year, wenHop.month, wenHop.day, 12))
     atmosModel = st.selectbox('Define an Atmospheric Model for Environment Setup',
-                              ('StandardAtmosphere', 'WyomingSounding', 'NOAARucSounding', 'Forecast', 'Reanalysis', 'Ensemble'))
+                              ('Forecast', 'WyomingSounding', 'NOAARucSounding', 'StandardAtmosphere', 'Reanalysis', 'Ensemble'))
 
     if atmosModel == 'Forecast':
         file_type = st.selectbox('Specify Location of Data',
@@ -60,5 +60,6 @@ def app():
     else:
         Env.setAtmosphericModel(type=atmosModel, file=file_type)
 
+    environmentTable = pd.DataFrame.from_dict(Env.allInfoReturned(Env))
     if st.button("Run Environment Simulation"):
-        st.text(print(Env.info()))
+        st.table(environmentTable)
