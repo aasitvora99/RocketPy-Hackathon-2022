@@ -1602,10 +1602,11 @@ class Flight:
         for event in self.parachuteEvents:
             triggerTime = event[0]
             parachute = event[1]
-            openTime = triggerTime + parachute.lag
-            velocity = self.freestreamSpeed(openTime + 2)
+            openTime = float(triggerTime)  # + parachute.lag
+            velocity = self.freestreamSpeed(openTime)
             results = 0.5 * self.parachuteCdS * 1.2337 * velocity * velocity
-            print(parachute+ " Chute opening force: " + results + " N")
+            #print(" Chute opening force: " + str(results) + " N")
+            print (results)
 
         return None
 
