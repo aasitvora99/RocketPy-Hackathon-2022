@@ -1,14 +1,16 @@
 import streamlit as st
-from pages import home
-from pages import addEnvironment
-from pages import addMotor
-from pages import addRocket
-from pages import Results
+from appPages import home
+from appPages import addEnvironment
+from appPages import addMotor
+from appPages import addRocket
+from appPages import Results
 import os
 
 # os.chdir('../docs/notebooks')
 landing = st.container()
 
+
+# def main():
 # Adding Navigation Pages
 with landing:
     PAGES = {
@@ -19,8 +21,12 @@ with landing:
         "Results": Results,
     }
 
-    st.sidebar.title("RocketPy")
+st.sidebar.title("RocketPy")
 
-    selection = st.sidebar.radio("Go to", list(PAGES.keys()))
-    page = PAGES[selection]
-    page.app()
+selection = st.sidebar.radio("Go to", list(PAGES.keys()))
+page = PAGES[selection]
+page.app()
+
+
+# if __name__ == "__main__":
+#     main()
