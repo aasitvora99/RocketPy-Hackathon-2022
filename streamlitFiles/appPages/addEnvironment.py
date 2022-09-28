@@ -5,7 +5,7 @@ import streamlit as st
 import pandas as pd
 from rocketpy import Environment
 import numpy as np
-from bokeh.plotting import figure
+#from bokeh.plotting import figure
 
 st.set_page_config(
     page_title="Environment Simulation",
@@ -227,16 +227,16 @@ def app():
                     environmentTableDict["surfaceSpeedOfSound"],
                     " m/s",
                 )
-            with amp:
-                st.write(environmentPlotsDict)
-                ax1 = pd.DataFrame(
-                    {
-                        "Grid": environmentPlotsDict["grid"],
-                        "Wind Speed": environmentPlotsDict["windSpeed"],
-                        "Wind Direction": environmentPlotsDict["windDirection"],
-                    }
-                )
-                st.vega_lite_chart(ax1, {})
+            # with amp:
+            #     st.write(environmentPlotsDict)
+            #     ax1 = pd.DataFrame(
+            #         {
+            #             "Grid": environmentPlotsDict["grid"],
+            #             "Wind Speed": environmentPlotsDict["windSpeed"],
+            #             "Wind Direction": environmentPlotsDict["windDirection"],
+            #         }
+            #     )
+            #     st.vega_lite_chart(ax1, {})
 
 
 # {
