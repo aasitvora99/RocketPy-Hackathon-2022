@@ -1,10 +1,12 @@
 from operator import truediv
-import rocketpy
+
+# import rocketpy
 from datetime import datetime
 import streamlit as st
 import pandas as pd
 from rocketpy import Environment
 import numpy as np
+import altair as alt
 
 
 st.set_page_config(
@@ -227,16 +229,67 @@ def app():
                     environmentTableDict["surfaceSpeedOfSound"],
                     " m/s",
                 )
-            # with amp:
-            #     st.write(environmentPlotsDict)
-            #     ax1 = pd.DataFrame(
-            #         {
-            #             "Grid": environmentPlotsDict["grid"],
-            #             "Wind Speed": environmentPlotsDict["windSpeed"],
-            #             "Wind Direction": environmentPlotsDict["windDirection"],
-            #         }
-            #     )
-            #     st.vega_lite_chart(ax1, {})
+            with amp:
+                st.write(environmentPlotsDict)
+                ax1 = pd.DataFrame(
+                    {
+                        "Height above MSL": environmentPlotsDict["grid"],
+                        "Wind Speed": environmentPlotsDict["windSpeed"],
+                        "Wind Direction": environmentPlotsDict["windDirection"],
+                    },
+                    index=environmentPlotsDict["grid"],
+                )
+                # st.vega_lite_chart(ax1,{
+                #     'mark'{'type': 'line', 'tooltip':True},
+                #     'encoding':{
+                #         'x': {'field':'Height above Sea Level (m)'},
+                #         'y': {'field':'Wind Speed (m/s) & Wind Direction (°)'}
+                #     }
+                # })
+                # st.line_chart(
+                #     ax1,
+                #     # x="Height above Sea Level (m)",
+                #     # y="Wind Speed (m/s) & Wind Direction (°)",
+                # )
+
+                # DISCARD!!!
+                # line_chart = (
+                #     alt.Chart(ax1)
+                #     .mark_line(interpolate="basis")
+                #     .encode(
+                #         alt.X("Wind Speed (m/s)", title="Wind Speed (m/s)"),
+                #         alt.X2("Wind Direction (°)", title="Wind Direction (°)"),
+                #         alt.Y(
+                #             "Height above Sea Level (m)",
+                #             title="Height above Sea Level (m)",
+                #         ),
+                #         color="type",
+                #     )
+                #     .properties(title="Sales of consumer goods")
+                # )
+                # st.altair_chart(line_chart.resolve_case(x="independent"))
+
+                base = alt.Chart(ax1).encode(
+                    alt.Y(
+                        "Height above MSL",
+                        axis=alt.Axis(title="Height above Sea Level (m)"),
+                    )
+                )
+                line1 = base.mark_line(stroke="#5276A7", interpolate="monotone").encode(
+                    alt.X(
+                        "Wind Speed",
+                        axis=alt.Axis(title="Wind Speed (m/s)", titleColor="#5276A7"),
+                    )
+                )
+
+                line2 = base.mark_line(stroke="#5276A7", interpolate="monotone").encode(
+                    alt.X2(
+                        "Wind Direction",
+                        axis=alt.Axis(title="Wind Direction (°)", titleColor="#FF0000"),
+                    )
+                )
+                chart1 = alt.layer(line1, line2).resolve_scale(y="independent")
+                st.altair_chart(chart1)
 
 
 # {
