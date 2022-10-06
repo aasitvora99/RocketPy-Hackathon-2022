@@ -2,6 +2,7 @@ from operator import truediv
 
 # import rocketpy
 from datetime import datetime
+from turtle import color
 import streamlit as st
 import pandas as pd
 from rocketpy import Environment
@@ -231,14 +232,7 @@ def app():
                 )
             with amp:
                 st.write(environmentPlotsDict)
-                ax1 = pd.DataFrame(
-                    {
-                        "Height above MSL": environmentPlotsDict["grid"],
-                        "Wind Speed": environmentPlotsDict["windSpeed"],
-                        "Wind Direction": environmentPlotsDict["windDirection"],
-                    },
-                    index=environmentPlotsDict["grid"],
-                )
+                ax1 = pd.DataFrame(environmentPlotsDict)
                 # st.vega_lite_chart(ax1,{
                 #     'mark'{'type': 'line', 'tooltip':True},
                 #     'encoding':{
@@ -251,49 +245,118 @@ def app():
                 #     # x="Height above Sea Level (m)",
                 #     # y="Wind Speed (m/s) & Wind Direction (°)",
                 # )
-
-                # DISCARD!!!
-                # line_chart = (
-                #     alt.Chart(ax1)
-                #     .mark_line(interpolate="basis")
-                #     .encode(
-                #         alt.X("Wind Speed (m/s)", title="Wind Speed (m/s)"),
-                #         alt.X2("Wind Direction (°)", title="Wind Direction (°)"),
-                #         alt.Y(
-                #             "Height above Sea Level (m)",
-                #             title="Height above Sea Level (m)",
-                #         ),
-                #         color="type",
-                #     )
-                #     .properties(title="Sales of consumer goods")
-                # )
-                # st.altair_chart(line_chart.resolve_case(x="independent"))
-
-                base = alt.Chart(ax1).encode(
-                    alt.Y(
-                        "Height above MSL",
-                        axis=alt.Axis(title="Height above Sea Level (m)"),
+                ampCol1, ampCol2 = st.columns(2)
+                with ampCol1:
+                    gridBase = alt.Chart(ax1).encode(
+                        alt.Y(
+                            "grid",
+                            axis=alt.Axis(title="Height above Sea Level (m)"),
+                        )
                     )
-                )
-                line1 = base.mark_line(stroke="#FF0000", interpolate="monotone").encode(
-                    alt.X(
-                        "Wind Speed",
-                        axis=alt.Axis(
-                            title="Wind Speed (m/s)",
+                    line1 = (
+                        gridBase.mark_line(stroke="#FF0000", interpolate="monotone")
+                        .encode(
+                            alt.X(
+                                "windSpeed",
+                                axis=alt.Axis(
+                                    title="Wind Speed (m/s)",
+                                    titleColor="#FF0000",
+                                ),
+                            ),
+                            tooltip=["grid", "windSpeed"],
+                        )
+                        .interactive()
+                    )
+                    line2 = (
+                        gridBase.mark_line(stroke="#0000FF", interpolate="monotone")
+                        .encode(
+                            alt.X(
+                                "windDirection",
+                                axis=alt.Axis(
+                                    title="Wind Direction (°)",
+                                    titleColor="#0000FF",
+                                ),
+                            ),
+                            tooltip=["grid", "windDirection"],
+                        )
+                        .interactive()
+                    )
+                    chart1 = alt.layer(line1, line2).resolve_scale(x="independent")
+                    st.altair_chart(chart1, use_container_width=True)
+
+                    windVelXLine = (
+                        gridBase.mark_line(stroke="#FF0000", interpolate="monotone")
+                        .encode(
+                            alt.X(
+                                "windVelX",
+                                axis=alt.Axis(
+                                    title="Wind U (m/s)",
+                                    titleColor="#FF0000",
+                                ),
+                            ),
+                            tooltip=["grid", "windVelX"],
+                        )
+                        .interactive()
+                    )
+
+                    windVelYLine = (
+                        gridBase.mark_line(stroke="#0000FF", interpolate="monotone")
+                        .encode(
+                            alt.X(
+                                "windVelY",
+                                axis=alt.Axis(
+                                    title="Wind V (m/s)",
+                                    titleColor="#0000FF",
+                                ),
+                            ),
+                            tooltip=["grid", "windVelY"],
+                        )
+                        .interactive()
+                    )
+
+                    chart2 = alt.layer(windVelXLine, windVelYLine)
+                    st.altair_chart(chart2, use_container_width=True)
+
+                with ampCol2:
+
+                    densityLine = (
+                        gridBase.mark_line(stroke="#FF0000", interpolate="monotone")
+                        .encode(
+                            alt.X(
+                                "density",
+                                axis=alt.Axis(
+                                    title="Density (kg/m3)",
+                                    titleColor="#FF0000",
+                                ),
+                            ),
+                            tooltip=["grid", "density"],
+                        )
+                        .interactive()
+                    )
+                    speedOfSoundLine = gridBase.mark_circle(
+                        stroke="#0000FF",
+                        interpolate="monotone",
+                        size=10,
+                    ).encode(
+                        alt.X(
+                            "speedOfSound",
+                            axis=alt.Axis(
+                                title="Speed of Sound (m/s)",
+                                titleColor="#0000FF",
+                            ),
                         ),
+                        tooltip=["grid", "speedOfSound"],
                     )
-                )
+                    # Fix Loess Transform for speed of sound line
+                    # loess = gridBase.transform_loess("grid", "speedOfSound").mark_line(
+                    #     color="#0000FF"
+                    # )
 
-                line2 = base.mark_line(stroke="#0000FF", interpolate="monotone").encode(
-                    alt.X(
-                        "Wind Direction",
-                        axis=alt.Axis(
-                            title="Wind Direction (°)",
-                        ),
+                    chart3 = alt.layer(densityLine, speedOfSoundLine).resolve_scale(
+                        x="independent"
                     )
-                )
-                chart1 = alt.layer(line1, line2).resolve_scale(x="independent")
-                st.altair_chart(chart1)
+                    # chart3 = (chart3 + loess).interactive()
+                    st.altair_chart(chart3, use_container_width=True)
 
 
 # {
