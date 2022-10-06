@@ -275,20 +275,24 @@ def app():
                         axis=alt.Axis(title="Height above Sea Level (m)"),
                     )
                 )
-                line1 = base.mark_line(stroke="#5276A7", interpolate="monotone").encode(
+                line1 = base.mark_line(stroke="#FF0000", interpolate="monotone").encode(
                     alt.X(
                         "Wind Speed",
-                        axis=alt.Axis(title="Wind Speed (m/s)", titleColor="#5276A7"),
+                        axis=alt.Axis(
+                            title="Wind Speed (m/s)",
+                        ),
                     )
                 )
 
-                line2 = base.mark_line(stroke="#5276A7", interpolate="monotone").encode(
-                    alt.X2(
+                line2 = base.mark_line(stroke="#0000FF", interpolate="monotone").encode(
+                    alt.X(
                         "Wind Direction",
-                        axis=alt.Axis(title="Wind Direction (°)", titleColor="#FF0000"),
+                        axis=alt.Axis(
+                            title="Wind Direction (°)",
+                        ),
                     )
                 )
-                chart1 = alt.layer(line1, line2).resolve_scale(y="independent")
+                chart1 = alt.layer(line1, line2).resolve_scale(x="independent")
                 st.altair_chart(chart1)
 
 
