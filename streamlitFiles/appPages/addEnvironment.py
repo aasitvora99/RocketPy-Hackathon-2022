@@ -257,7 +257,7 @@ def app():
                         gridBase.mark_line(stroke="#FF0000", interpolate="monotone")
                         .encode(
                             alt.X(
-                                "windSpeed",
+                                "average(windSpeed)",
                                 axis=alt.Axis(
                                     title="Wind Speed (m/s)",
                                     titleColor="#FF0000",
@@ -271,7 +271,7 @@ def app():
                         gridBase.mark_line(stroke="#0000FF", interpolate="monotone")
                         .encode(
                             alt.X(
-                                "windDirection",
+                                "average(windDirection)",
                                 axis=alt.Axis(
                                     title="Wind Direction (°)",
                                     titleColor="#0000FF",
@@ -288,7 +288,7 @@ def app():
                         gridBase.mark_line(stroke="#FF0000", interpolate="monotone")
                         .encode(
                             alt.X(
-                                "windVelX",
+                                "average(windVelX)",
                                 axis=alt.Axis(
                                     title="Wind U (m/s)",
                                     titleColor="#FF0000",
@@ -303,7 +303,7 @@ def app():
                         gridBase.mark_line(stroke="#0000FF", interpolate="monotone")
                         .encode(
                             alt.X(
-                                "windVelY",
+                                "average(windVelY)",
                                 axis=alt.Axis(
                                     title="Wind V (m/s)",
                                     titleColor="#0000FF",
@@ -323,7 +323,7 @@ def app():
                         gridBase.mark_line(stroke="#FF0000", interpolate="monotone")
                         .encode(
                             alt.X(
-                                "density",
+                                "average(density)",
                                 axis=alt.Axis(
                                     title="Density (kg/m3)",
                                     titleColor="#FF0000",
@@ -333,13 +333,12 @@ def app():
                         )
                         .interactive()
                     )
-                    speedOfSoundLine = gridBase.mark_circle(
+                    speedOfSoundLine = gridBase.mark_line(
                         stroke="#0000FF",
                         interpolate="monotone",
-                        size=10,
                     ).encode(
                         alt.X(
-                            "speedOfSound",
+                            "average(speedOfSound)",
                             axis=alt.Axis(
                                 title="Speed of Sound (m/s)",
                                 titleColor="#0000FF",
@@ -357,6 +356,41 @@ def app():
                     )
                     # chart3 = (chart3 + loess).interactive()
                     st.altair_chart(chart3, use_container_width=True)
+
+                    pressureLine = (
+                        gridBase.mark_line(stroke="#FF0000", interpolate="monotone")
+                        .encode(
+                            alt.X(
+                                "pressure",
+                                axis=alt.Axis(
+                                    title="Pressure (hPa)",
+                                    titleColor="#FF0000",
+                                ),
+                            ),
+                            tooltip=["grid", "pressure"],
+                        )
+                        .interactive()
+                    )
+
+                    tempratureLine = (
+                        gridBase.mark_line(stroke="#0000FF", interpolate="monotone")
+                        .encode(
+                            alt.X(
+                                "average(temperature)",
+                                axis=alt.Axis(
+                                    title="Temprature (K)",
+                                    titleColor="#0000FF",
+                                ),
+                            ),
+                            tooltip=["grid", "temperature"],
+                        )
+                        .interactive()
+                    )
+
+                    chart4 = alt.layer(pressureLine, tempratureLine).resolve_scale(
+                        x="independent"
+                    )
+                    st.altair_chart(chart4, use_container_width=True)
 
 
 # {
