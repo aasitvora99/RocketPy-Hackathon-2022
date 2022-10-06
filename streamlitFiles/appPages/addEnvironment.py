@@ -231,7 +231,7 @@ def app():
                     " m/s",
                 )
             with amp:
-                st.write(environmentPlotsDict)
+                # st.write(environmentPlotsDict)
                 ax1 = pd.DataFrame(environmentPlotsDict)
                 # st.vega_lite_chart(ax1,{
                 #     'mark'{'type': 'line', 'tooltip':True},
@@ -253,7 +253,7 @@ def app():
                             axis=alt.Axis(title="Height above Sea Level (m)"),
                         )
                     )
-                    line1 = (
+                    windSpeedLine = (
                         gridBase.mark_line(stroke="#FF0000", interpolate="monotone")
                         .encode(
                             alt.X(
@@ -267,7 +267,7 @@ def app():
                         )
                         .interactive()
                     )
-                    line2 = (
+                    windDirLine = (
                         gridBase.mark_line(stroke="#0000FF", interpolate="monotone")
                         .encode(
                             alt.X(
@@ -281,7 +281,9 @@ def app():
                         )
                         .interactive()
                     )
-                    chart1 = alt.layer(line1, line2).resolve_scale(x="independent")
+                    chart1 = alt.layer(windSpeedLine, windDirLine).resolve_scale(
+                        x="independent"
+                    )
                     st.altair_chart(chart1, use_container_width=True)
 
                     windVelXLine = (
