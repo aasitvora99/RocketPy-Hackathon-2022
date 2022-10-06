@@ -78,8 +78,8 @@ def app():
         throatRadius,
         interpolationMethod,
     )
-    if thrustSource == None:
-        st.button("simulate", disabled=True)
-    else:
-        if st.button("simulate"):
-            st.write = rokit.allInfo()
+    # if thrustSource == None:
+    #     st.button("simulate", disabled=True)
+    # else:
+    #     if st.button("simulate"):
+    #         st.write = rokit.allInfo()
