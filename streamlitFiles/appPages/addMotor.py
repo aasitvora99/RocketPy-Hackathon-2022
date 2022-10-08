@@ -1,11 +1,24 @@
-import csv
+from asyncore import write
 import streamlit as st
 from rocketpy import Motor
+import os
+from rocketpy import Function
 
 
 def app():
-    st.write("hello world")
-    thrustSource = st.file_uploader(label="Upload Engine File")
+    # simCheck = False
+    # if simCheck == True:
+    #     thrustSource = None
+    motorList = {}
+    for root, dir, files in os.walk("data\motors"):
+        for file in files:
+            filePath = os.path.join(root, file)
+            motorList.update({file[:-4]: filePath})  # -4 for removing .eng from name
+
+    thrustSource = st.selectbox("Pick an Engine", options=motorList.keys())
+    thrustSource = motorList[thrustSource]
+    st.write(thrustSource)
+    # thrustSource = st.file_uploader(label="Upload Engine File")
     burnOut = st.number_input(
         "Motor Burnout (s)", value=3.9, min_value=0.0, format="%f"
     )
@@ -66,20 +79,27 @@ def app():
     )
 
     rokit = Motor.SolidMotor(
-        thrustSource,
-        burnOut,
-        grainNumber,
-        grainSeparation,
-        grainDensity,
-        grainOuterRadius,
-        grainInitialInnerRadius,
-        grainInitialHeight,
-        nozzleRadius,
-        throatRadius,
-        interpolationMethod,
+        thrustSource=thrustSource,
+        burnOut=burnOut,
+        grainNumber=grainNumber,
+        grainSeparation=grainSeparation,
+        grainDensity=grainDensity,
+        grainOuterRadius=grainOuterRadius,
+        grainInitialInnerRadius=grainInitialInnerRadius,
+        grainInitialHeight=grainInitialHeight,
+        nozzleRadius=nozzleRadius,
+        throatRadius=throatRadius,
+        interpolationMethod=interpolationMethod,
     )
-    # if thrustSource == None:
-    #     st.button("simulate", disabled=True)
-    # else:
-    #     if st.button("simulate"):
-    #         st.write = rokit.allInfo()
+    if thrustSource == None:
+        st.button(
+            "simulate",
+            disabled=True,
+        )  # on_click=simCheck)
+    else:
+        if st.button("simulate"):
+
+            rokit.thrust = Function(
+                thrustSource, "Time (s)", "Thrust (N)", rokit.interpolate, "zero"
+            )
+            st.write(rokit.thrust())
