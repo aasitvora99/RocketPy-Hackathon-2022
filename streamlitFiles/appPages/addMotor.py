@@ -1,7 +1,9 @@
+from tabnanny import check
 import streamlit as st
 from rocketpy import Motor
 import os
 import pandas as pd
+import tempfile
 
 
 def app():
@@ -13,69 +15,127 @@ def app():
         for file in files:
             filePath = os.path.join(root, file)
             motorList.update({file[:-4]: filePath})  # -4 for removing .eng from name
+    thrustSource = ""
+    col1, col2, col3 = st.columns([3, 0.5, 3])
+    with col3:
+        with st.form("Select Engine Form"):
+            thrustSourceList = st.selectbox("Pick an Engine", options=motorList.keys())
+            submitted = st.form_submit_button("Submit")
+            thrustSource = motorList[thrustSourceList]
+            if submitted:
+                thrustSource = motorList[thrustSourceList]
+                st.write(thrustSource)
 
-    thrustSource = st.selectbox("Pick an Engine", options=motorList.keys())
-    thrustSource = motorList[thrustSource]
-    st.write(thrustSource)
-    # thrustSource = st.file_uploader(label="Upload Engine File")
-    burnOut = st.number_input(
-        "Motor Burnout (s)", value=3.9, min_value=0.0, format="%f"
-    )
-    grainNumber = st.number_input("Number of Grains", value=5, min_value=1, format="%d")
-    grainSeparation = st.number_input(
-        "Grain Separation (m)",
-        value=(5 / 1000),
-        min_value=0.0,
-        format="%f",
-        help="Distance between two grains in meters.",
-    )
-    grainDensity = st.number_input(
-        "Grain Density (kg/m^3)",
-        value=1815.0,
-        min_value=0.0,
-        format="%f",
-        help="Density of each grain in kg/meters cubed.",
-    )
-    grainOuterRadius = st.number_input(
-        "Grain Outer Radius (m)",
-        value=(33 / 1000),
-        min_value=0.0,
-        format="%f",
-        help="Outer radius of each grain in meters.",
-    )
-    grainInitialInnerRadius = st.number_input(
-        "Grain Initial Inner Radius (m)",
-        value=(15 / 1000),
-        min_value=0.0,
-        format="%f",
-        help="Initial inner radius of each grain in meters.",
-    )
-    grainInitialHeight = st.number_input(
-        "Grain Height (m)",
-        value=(120 / 1000),
-        min_value=0.0,
-        format="%f",
-        help="Initial height of each grain in meters.",
-    )
-    nozzleRadius = st.number_input(
-        "Nozzle Radius (m)",
-        value=(33 / 1000),
-        min_value=0.0,
-        format="%f",
-        help="Motor's nozzle outlet radius in meters. Used to calculate Kn curve. Optional if the Kn curve is not interesting. Its value does not impact trajectory simulation.",
-    )
-    throatRadius = st.number_input(
-        "Nozzle Throat Radius (m)",
-        value=(11 / 1000),
-        min_value=0.0,
-        format="%f",
-        help="Motor's nozzle throat radius in meters. Its value has very low impact in trajectory simulation, only useful to analyze dynamic instabilities, therefore it is optional.",
-    )
-    interpolationMethod = st.selectbox(
-        "Interpolation Method",
-        ("linear", "akima", "spline"),
-        help="Method of interpolation to be used in case thrust curve is given by data set in .csv or .eng, or as an array.",
-    )
+    with col2:
+        st.write("#  OR")
+
+    with col1:
+        with st.form("Upload Engine Form", clear_on_submit=True):
+            motorFileUpload = st.file_uploader(label="Upload Engine File", type=["eng"])
+            checkboxFlag = st.checkbox("Save to Library")
+            # Every form must have a submit button.
+            uploaded = st.form_submit_button("Upload")
+            if uploaded:
+                st.write(
+                    "Motor", motorFileUpload.name, "Save to Library: ", checkboxFlag
+                )
+
+            if motorFileUpload is not None and checkboxFlag is True:
+                fileDetails = {
+                    "fileName": motorFileUpload.name,
+                    "fileType": motorFileUpload.type,
+                }
+                st.write(fileDetails)
+
+                with open(os.path.join("data\motors", motorFileUpload.name), "wb") as f:
+                    f.write(motorFileUpload.getbuffer())
+                thrustSource = os.path.join("data\motors", motorFileUpload.name)
+
+            elif motorFileUpload is not None and checkboxFlag is False:
+                with open(
+                    os.path.join("streamlitFiles\__pycache__", motorFileUpload.name),
+                    "wb",
+                ) as f:
+                    f.write(motorFileUpload.getbuffer())
+                    thrustSource = os.path.join(
+                        "streamlitFiles\__pycache__", motorFileUpload.name
+                    )
+
+    st.write("Motor Loaded: ", thrustSource[12:-4])
+
+    col1, col2, col3, col4, col5 = st.columns(5)
+
+    with col1:
+        burnOut = st.number_input(
+            "Motor Burnout (s)", value=3.9, min_value=0.0, format="%f"
+        )
+        grainNumber = st.number_input(
+            "Number of Grains", value=5, min_value=1, format="%d"
+        )
+
+    with col2:
+        grainDensity = st.number_input(
+            "Grain Density (kg/m^3)",
+            value=1815.0,
+            min_value=0.0,
+            format="%f",
+            help="Density of each grain in kg/meters cubed.",
+        )
+        grainOuterRadius = st.number_input(
+            "Grain Outer Radius (m)",
+            value=(33 / 1000),
+            min_value=0.0,
+            format="%f",
+            help="Outer radius of each grain in meters.",
+        )
+
+    with col3:
+
+        grainInitialInnerRadius = st.number_input(
+            "Grain Initial Inner Radius (m)",
+            value=(15 / 1000),
+            min_value=0.0,
+            format="%f",
+            help="Initial inner radius of each grain in meters.",
+        )
+        grainInitialHeight = st.number_input(
+            "Grain Height (m)",
+            value=(120 / 1000),
+            min_value=0.0,
+            format="%f",
+            help="Initial height of each grain in meters.",
+        )
+
+    with col4:
+
+        nozzleRadius = st.number_input(
+            "Nozzle Radius (m)",
+            value=(33 / 1000),
+            min_value=0.0,
+            format="%f",
+            help="Motor's nozzle outlet radius in meters. Used to calculate Kn curve. Optional if the Kn curve is not interesting. Its value does not impact trajectory simulation.",
+        )
+        throatRadius = st.number_input(
+            "Nozzle Throat Radius (m)",
+            value=(11 / 1000),
+            min_value=0.0,
+            format="%f",
+            help="Motor's nozzle throat radius in meters. Its value has very low impact in trajectory simulation, only useful to analyze dynamic instabilities, therefore it is optional.",
+        )
+
+    with col5:
+        grainSeparation = st.number_input(
+            "Grain Separation (m)",
+            value=(5 / 1000),
+            min_value=0.0,
+            format="%f",
+            help="Distance between two grains in meters.",
+        )
+        interpolationMethod = st.selectbox(
+            "Interpolation Method",
+            ("linear", "akima", "spline"),
+            help="Method of interpolation to be used in case thrust curve is given by data set in .csv or .eng, or as an array.",
+        )
 
     rokit = Motor.SolidMotor(
         thrustSource=thrustSource,
@@ -92,6 +152,9 @@ def app():
     )
 
     if st.button("Simulate"):
+
+        os.remove(thrustSource)
+        thrustSource = ""
         col1, col2, col3 = st.columns(3)
 
         with st.container():
@@ -127,10 +190,11 @@ def app():
                 )
                 st.write("Total Impulse: ", rokit.totalImpulse, " Ns")
 
+        st.subheader("Plots")
         col4, col5, col6, col7 = st.columns(4)
         with col4:
 
-            rokit.allInfo()
+            # rokit.allInfo()
             st.write("Thrust(N) x Time(s)")
             thrustDF = pd.DataFrame(
                 rokit.thrust.source[:, 1], index=rokit.thrust.source[:, 0]
