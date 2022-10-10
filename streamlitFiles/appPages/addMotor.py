@@ -5,6 +5,7 @@ import os
 from rocketpy import Function
 import altair as alt
 import pandas as pd
+import numpy as np
 
 # from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
 
@@ -143,11 +144,95 @@ def app():
     #         )
     #         st.write(rokit.thrust())
     if st.button("Simulate"):
-        rokit.allInfo()
 
+        rokit.allInfo()
+        st.write("Thrust(N) x Time(s)")
         thrustDF = pd.DataFrame(
             rokit.thrust.source[:, 1], index=rokit.thrust.source[:, 0]
         )
-        st.line_chart(thrustDF)
-        st.write(thrustDF)
-        st.write(type(thrustDF))
+        thrustDF.columns = ["Thrust (N)"]
+        st.line_chart(thrustDF, use_container_width=True)
+
+        st.write("Propellant Total Mass (Kg) x Time(s)")
+        massDF = pd.DataFrame(rokit.mass.source[:, 1], index=rokit.mass.source[:, 0])
+        massDF.columns = ["Propellant Total Mass (Kg)"]
+        st.line_chart(massDF, use_container_width=True)
+
+        st.write("Mass Dot (Kg/S) x Time(s)")
+        massDotDF = pd.DataFrame(
+            rokit.massDot.source[:, 1], index=rokit.massDot.source[:, 0]
+        )
+        massDotDF.columns = ["Mass Dot (Kg/S)"]
+        st.line_chart(massDotDF, use_container_width=True)
+
+        st.write("Grain Inner Radius (M) x Time(s)")
+        grainInnerRadiusDF = pd.DataFrame(
+            rokit.grainInnerRadius.source[:, 1],
+            index=rokit.grainInnerRadius.source[:, 0],
+        )
+        grainInnerRadiusDF.columns = ["Grain Inner Radius (M)"]
+        st.line_chart(grainInnerRadiusDF, use_container_width=True)
+
+        st.write("Grain Height (M) x Time(s)")
+        grainHeightDF = pd.DataFrame(
+            rokit.grainHeight.source[:, 1],
+            index=rokit.grainHeight.source[:, 0],
+        )
+        grainHeightDF.columns = ["Grain Height (M)"]
+        st.line_chart(grainHeightDF, use_container_width=True)
+
+        st.write("Burn Rate (M/s) x Time(s)")
+        burnRateDF = pd.DataFrame(
+            rokit.burnRate.source[:, 1],
+            index=rokit.burnRate.source[:, 0],
+        )
+        burnRateDF.columns = ["Burn Rate (M/s)"]
+        st.line_chart(burnRateDF, use_container_width=True)
+
+        st.write("Burn Area (M^2) x Time(s)")
+        burnAreaDF = pd.DataFrame(
+            rokit.burnArea.source[:, 1],
+            index=rokit.burnArea.source[:, 0],
+        )
+        burnAreaDF.columns = ["Burn Area (M^2)"]
+        st.line_chart(burnAreaDF, use_container_width=True)
+
+        st.write("Kn (M^2/M^2) x Grain Inner Radius(M)")
+        KnDF = pd.DataFrame(
+            rokit.Kn.source[:, 1],
+            index=rokit.Kn.source[:, 0],
+        )
+        KnDF.columns = ["Kn (M^2/M^2)"]
+        st.line_chart(KnDF, use_container_width=True)
+
+        st.write("Propellant Inertia I (Kg*M^2) x Time(s)")
+        inertiaIDF = pd.DataFrame(
+            rokit.inertiaI.source[:, 1],
+            index=rokit.inertiaI.source[:, 0],
+        )
+        inertiaIDF.columns = ["Propellant Inertia I (Kg*M^2)"]
+        st.line_chart(inertiaIDF, use_container_width=True)
+
+        st.write("Propellant Inertia I Dot (Kg*M^2/s) x Time(s)")
+        inertiaIDotDF = pd.DataFrame(
+            rokit.inertiaIDot.source[:, 1],
+            index=rokit.inertiaIDot.source[:, 0],
+        )
+        inertiaIDotDF.columns = ["Propellant Inertia I Dot (Kg*M^2/s)"]
+        st.line_chart(inertiaIDotDF, use_container_width=True)
+
+        st.write("Propellant Inertia Z (Kg*M^2) x Time(s)")
+        inertiaZDF = pd.DataFrame(
+            rokit.inertiaZ.source[:, 1],
+            index=rokit.inertiaZ.source[:, 0],
+        )
+        inertiaZDF.columns = ["Propellant Inertia Z (Kg*M^2)"]
+        st.line_chart(inertiaZDF, use_container_width=True)
+
+        st.write("Propellant Inertia Z Dot (Kg*M^2/s) x Time(s)")
+        inertiaZDotDF = pd.DataFrame(
+            rokit.inertiaZDot.source[:, 1],
+            index=rokit.inertiaZDot.source[:, 0],
+        )
+        inertiaZDotDF.columns = ["Propellant Inertia Z Dot (Kg*M^2/s)"]
+        st.line_chart(inertiaZDotDF, use_container_width=True)
