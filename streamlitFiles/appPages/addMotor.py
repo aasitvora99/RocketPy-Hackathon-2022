@@ -3,6 +3,43 @@ import streamlit as st
 from rocketpy import Motor
 import os
 from rocketpy import Function
+import altair as alt
+import pandas as pd
+
+# from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
+
+# from contextlib import contextmanager
+# from io import StringIO
+# from threading import current_thread
+# import sys
+
+
+# @contextmanager
+# def st_redirect(src, dst):
+#     placeholder = st.empty()
+#     output_func = getattr(placeholder, dst)
+
+#     with StringIO() as buffer:
+#         old_write = src.write
+
+#         def new_write(b):
+#             if getattr(current_thread(), get_script_run_ctx, None):
+#                 buffer.write(b)
+#                 output_func(buffer.getvalue())
+#             else:
+#                 old_write(b)
+
+#         try:
+#             src.write = new_write
+#             yield
+#         finally:
+#             src.write = old_write
+
+
+# @contextmanager
+# def st_stdout(dst):
+#     with st_redirect(sys.stdout, dst):
+#         yield
 
 
 def app():
@@ -91,15 +128,26 @@ def app():
         throatRadius=throatRadius,
         interpolationMethod=interpolationMethod,
     )
-    if thrustSource == None:
-        st.button(
-            "simulate",
-            disabled=True,
-        )  # on_click=simCheck)
-    else:
-        if st.button("simulate"):
+    # with st_stdout("code"):
+    #     print("Prints as st.code()")
+    # if thrustSource == None:
+    #     st.button(
+    #         "simulate",
+    #         disabled=True,
+    #     )  # on_click=simCheck)
+    # else:
+    #     if st.button("simulate"):
 
-            rokit.thrust = Function(
-                thrustSource, "Time (s)", "Thrust (N)", rokit.interpolate, "zero"
-            )
-            st.write(rokit.thrust())
+    #         rokit.thrust = Function(
+    #             thrustSource, "Time (s)", "Thrust (N)", rokit.interpolate, "zero"
+    #         )
+    #         st.write(rokit.thrust())
+    if st.button("Simulate"):
+        rokit.allInfo()
+
+        thrustDF = pd.DataFrame(
+            rokit.thrust.source[:, 1], index=rokit.thrust.source[:, 0]
+        )
+        st.line_chart(thrustDF)
+        st.write(thrustDF)
+        st.write(type(thrustDF))
