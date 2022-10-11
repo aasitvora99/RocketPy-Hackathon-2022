@@ -1,15 +1,16 @@
-from tabnanny import check
+import imp
 import streamlit as st
 from rocketpy import Motor
 import os
 import pandas as pd
-import tempfile
+from rocketpy import Rocket
 
 
 def app():
     # simCheck = False
     # if simCheck == True:
     #     thrustSource = None
+
     motorList = {}
     for root, dir, files in os.walk("data\motors"):
         for file in files:
@@ -136,84 +137,83 @@ def app():
             ("linear", "akima", "spline"),
             help="Method of interpolation to be used in case thrust curve is given by data set in .csv or .eng, or as an array.",
         )
-
-    rokit = Motor.SolidMotor(
-        thrustSource=thrustSource,
-        burnOut=burnOut,
-        grainNumber=grainNumber,
-        grainSeparation=grainSeparation,
-        grainDensity=grainDensity,
-        grainOuterRadius=grainOuterRadius,
-        grainInitialInnerRadius=grainInitialInnerRadius,
-        grainInitialHeight=grainInitialHeight,
-        nozzleRadius=nozzleRadius,
-        throatRadius=throatRadius,
-        interpolationMethod=interpolationMethod,
-    )
-
+        motir = Motor.SolidMotor(
+            thrustSource=thrustSource,
+            burnOut=burnOut,
+            grainNumber=grainNumber,
+            grainSeparation=grainSeparation,
+            grainDensity=grainDensity,
+            grainOuterRadius=grainOuterRadius,
+            grainInitialInnerRadius=grainInitialInnerRadius,
+            grainInitialHeight=grainInitialHeight,
+            nozzleRadius=nozzleRadius,
+            throatRadius=throatRadius,
+            interpolationMethod=interpolationMethod,
+        )
+        motir.zCM = 0
     if st.button("Simulate"):
-
-        os.remove(thrustSource)
-        thrustSource = ""
+        if checkboxFlag is False:
+            os.remove(thrustSource)
+            thrustSource = ""
         col1, col2, col3 = st.columns(3)
 
         with st.container():
 
             with col1:
                 st.subheader("Nozzle Details")
-                st.write("Nozzle Radius (m)", rokit.nozzleRadius)
-                st.write("Nozzle Throat Radius (m)", rokit.throatRadius)
+                st.write("Nozzle Radius (m)", motir.nozzleRadius)
+                st.write("Nozzle Throat Radius (m)", motir.throatRadius)
 
             with col2:
                 st.subheader("Grain Details")
-                st.write("Number of Grains", rokit.grainNumber)
-                st.write("Grain Spacing (m)", rokit.grainSeparation)
-                st.write("Grain Density (kg/m3)", rokit.grainDensity)
-                st.write("Grain Mass (kg)", rokit.grainInitialMass)
-                st.write("Grain Outer Radius (m)", rokit.grainOuterRadius)
-                st.write("Grain Inner Radius (m)", rokit.grainInitialInnerRadius)
-                st.write("Grain Height (m)", rokit.grainInitialHeight)
-                st.write("Grain Volume (cm3)", (rokit.grainInitialVolume * 1000000))
+                st.write("Number of Grains", motir.grainNumber)
+                st.write("Grain Spacing (m)", motir.grainSeparation)
+                st.write("Grain Density (kg/m3)", motir.grainDensity)
+                st.write("Grain Mass (kg)", motir.grainInitialMass)
+                st.write("Grain Outer Radius (m)", motir.grainOuterRadius)
+                st.write("Grain Inner Radius (m)", motir.grainInitialInnerRadius)
+                st.write("Grain Height (m)", motir.grainInitialHeight)
+                st.write("Grain Volume (cm3)", (motir.grainInitialVolume * 1000000))
 
             with col3:
                 st.subheader("Motor Details")
-                st.write("Total Burning Time: ", rokit.burnOutTime, " s")
-                st.write("Total Propellant Mass: ", rokit.propellantInitialMass, " Kg")
-                st.write("Propellant Exhaust Velocity: ", rokit.exhaustVelocity, "m/s")
-                st.write("Average Thrust: ", rokit.averageThrust, " N")
+                st.write("Total Burning Time: ", motir.burnOutTime, " s")
+                st.write("Total Propellant Mass: ", motir.propellantInitialMass, " Kg")
+                st.write("Propellant Exhaust Velocity: ", motir.exhaustVelocity, "m/s")
+                st.write("Average Thrust: ", motir.averageThrust, " N")
                 st.write(
                     "Maximum Thrust: ",
-                    rokit.maxThrust,
+                    motir.maxThrust,
                     " N at ",
-                    rokit.maxThrustTime,
+                    motir.maxThrustTime,
                     " s after ignition",
                 )
-                st.write("Total Impulse: ", rokit.totalImpulse, " Ns")
+                st.write("Total Impulse: ", motir.totalImpulse, " Ns")
 
         st.subheader("Plots")
         col4, col5, col6, col7 = st.columns(4)
         with col4:
 
-            # rokit.allInfo()
+            # motir.allInfo()
             st.write("Thrust(N) x Time(s)")
             thrustDF = pd.DataFrame(
-                rokit.thrust.source[:, 1], index=rokit.thrust.source[:, 0]
+                motir.thrust.source[:, 1], index=motir.thrust.source[:, 0]
             )
             thrustDF.columns = ["Thrust (N)"]
             st.line_chart(thrustDF, use_container_width=True)
 
             st.write("Grain Height (M) x Time(s)")
             grainHeightDF = pd.DataFrame(
-                rokit.grainHeight.source[:, 1],
-                index=rokit.grainHeight.source[:, 0],
+                motir.grainHeight.source[:, 1],
+                index=motir.grainHeight.source[:, 0],
             )
             grainHeightDF.columns = ["Grain Height (M)"]
             st.line_chart(grainHeightDF, use_container_width=True)
 
             st.write("Propellant Inertia I (Kg*M^2) x Time(s)")
             inertiaIDF = pd.DataFrame(
-                rokit.inertiaI.source[:, 1],
-                index=rokit.inertiaI.source[:, 0],
+                motir.inertiaI.source[:, 1],
+                index=motir.inertiaI.source[:, 0],
             )
             inertiaIDF.columns = ["Propellant Inertia I (Kg*M^2)"]
             st.line_chart(inertiaIDF, use_container_width=True)
@@ -222,23 +222,23 @@ def app():
 
             st.write("Propellant Total Mass (Kg) x Time(s)")
             massDF = pd.DataFrame(
-                rokit.mass.source[:, 1], index=rokit.mass.source[:, 0]
+                motir.mass.source[:, 1], index=motir.mass.source[:, 0]
             )
             massDF.columns = ["Propellant Total Mass (Kg)"]
             st.line_chart(massDF, use_container_width=True)
 
             st.write("Burn Rate (M/s) x Time(s)")
             burnRateDF = pd.DataFrame(
-                rokit.burnRate.source[:, 1],
-                index=rokit.burnRate.source[:, 0],
+                motir.burnRate.source[:, 1],
+                index=motir.burnRate.source[:, 0],
             )
             burnRateDF.columns = ["Burn Rate (M/s)"]
             st.line_chart(burnRateDF, use_container_width=True)
 
             st.write("Propellant Inertia I Dot (Kg*M^2/s) x Time(s)")
             inertiaIDotDF = pd.DataFrame(
-                rokit.inertiaIDot.source[:, 1],
-                index=rokit.inertiaIDot.source[:, 0],
+                motir.inertiaIDot.source[:, 1],
+                index=motir.inertiaIDot.source[:, 0],
             )
             inertiaIDotDF.columns = ["Propellant Inertia I Dot (Kg*M^2/s)"]
             st.line_chart(inertiaIDotDF, use_container_width=True)
@@ -247,23 +247,23 @@ def app():
 
             st.write("Mass Dot (Kg/S) x Time(s)")
             massDotDF = pd.DataFrame(
-                rokit.massDot.source[:, 1], index=rokit.massDot.source[:, 0]
+                motir.massDot.source[:, 1], index=motir.massDot.source[:, 0]
             )
             massDotDF.columns = ["Mass Dot (Kg/S)"]
             st.line_chart(massDotDF, use_container_width=True)
 
             st.write("Burn Area (M^2) x Time(s)")
             burnAreaDF = pd.DataFrame(
-                rokit.burnArea.source[:, 1],
-                index=rokit.burnArea.source[:, 0],
+                motir.burnArea.source[:, 1],
+                index=motir.burnArea.source[:, 0],
             )
             burnAreaDF.columns = ["Burn Area (M^2)"]
             st.line_chart(burnAreaDF, use_container_width=True)
 
             st.write("Propellant Inertia Z (Kg*M^2) x Time(s)")
             inertiaZDF = pd.DataFrame(
-                rokit.inertiaZ.source[:, 1],
-                index=rokit.inertiaZ.source[:, 0],
+                motir.inertiaZ.source[:, 1],
+                index=motir.inertiaZ.source[:, 0],
             )
             inertiaZDF.columns = ["Propellant Inertia Z (Kg*M^2)"]
             st.line_chart(inertiaZDF, use_container_width=True)
@@ -272,27 +272,28 @@ def app():
 
             st.write("Grain Inner Radius (M) x Time(s)")
             grainInnerRadiusDF = pd.DataFrame(
-                rokit.grainInnerRadius.source[:, 1],
-                index=rokit.grainInnerRadius.source[:, 0],
+                motir.grainInnerRadius.source[:, 1],
+                index=motir.grainInnerRadius.source[:, 0],
             )
             grainInnerRadiusDF.columns = ["Grain Inner Radius (M)"]
             st.line_chart(grainInnerRadiusDF, use_container_width=True)
 
             st.write("Kn (M^2/M^2) x Grain Inner Radius(M)")
             KnDF = pd.DataFrame(
-                rokit.Kn.source[:, 1],
-                index=rokit.Kn.source[:, 0],
+                motir.Kn.source[:, 1],
+                index=motir.Kn.source[:, 0],
             )
             KnDF.columns = ["Kn (M^2/M^2)"]
             st.line_chart(KnDF, use_container_width=True)
 
             st.write("Propellant Inertia Z Dot (Kg*M^2/s) x Time(s)")
             inertiaZDotDF = pd.DataFrame(
-                rokit.inertiaZDot.source[:, 1],
-                index=rokit.inertiaZDot.source[:, 0],
+                motir.inertiaZDot.source[:, 1],
+                index=motir.inertiaZDot.source[:, 0],
             )
             inertiaZDotDF.columns = ["Propellant Inertia Z Dot (Kg*M^2/s)"]
             st.line_chart(inertiaZDotDF, use_container_width=True)
+    return motir
 
 
 # Nozzle Details
