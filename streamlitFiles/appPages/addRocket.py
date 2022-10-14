@@ -1,7 +1,6 @@
 import streamlit as st
 import os
 from rocketpy import Rocket
-from appPages import addMotor
 
 
 def app():
@@ -98,11 +97,13 @@ def app():
                 step=0.01,
                 help="Two values which represent the distance of each of the two rail buttons to the center of mass of the rocket without propellant. If the rail button is positioned above the center of mass, its distance should be a positive value. If it is below, its distance should be a negative value. The order does not matter. All values should be in meters.",
             )
+
+            motor = st.session_state.motor
             setRailButtons = list(setRailButtons)
             rocketSubmitted = st.button("Submit")
             if rocketSubmitted:
                 rokit = Rocket(
-                    motor=addMotor.app,
+                    motor=motor,
                     radius=radius,
                     mass=mass,
                     inertiaI=inertiaI,
@@ -112,6 +113,5 @@ def app():
                     powerOffDrag=powerOffDrag,
                     powerOnDrag=powerOnDrag,
                 )
-                st.write(rokit)
                 rokit.setRailButtons(setRailButtons)
                 st.success("Rocket Added")

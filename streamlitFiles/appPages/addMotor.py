@@ -1,9 +1,7 @@
-import imp
 import streamlit as st
 from rocketpy import Motor
 import os
 import pandas as pd
-from rocketpy import Rocket
 
 
 def app():
@@ -151,10 +149,10 @@ def app():
             interpolationMethod=interpolationMethod,
         )
         motir.zCM = 0
+    # saving object to session state
+    st.session_state.motor = motir
     if st.button("Simulate"):
-        if checkboxFlag is False:
-            os.remove(thrustSource)
-            thrustSource = ""
+
         col1, col2, col3 = st.columns(3)
 
         with st.container():

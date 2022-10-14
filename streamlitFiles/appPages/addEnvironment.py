@@ -106,7 +106,8 @@ def app():
             df,
             use_container_width=True,
         )
-
+        # saving object to session state
+        st.session_state.env = Env
         environmentTableDict = dict(Env.allInfoReturned())
         environmentPlotsDict = dict(Env.allPlotInfoReturned())
         if st.button("Run Environment Simulation"):
