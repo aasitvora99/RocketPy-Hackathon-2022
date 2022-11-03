@@ -6,17 +6,17 @@ from appPages import addRocket
 from appPages import Results
 import os
 
-st.set_page_config(
-    page_title="RocketPy",
-    page_icon=":rocket:",
-    layout="wide",
-    initial_sidebar_state="expanded",
-    # menu_items={
-    #     "Get Help": "https://www.extremelycoolapp.com/help",
-    #     "Report a bug": "https://www.extremelycoolapp.com/bug",
-    #     "About": "# This is a header. This is an *extremely* cool app!",
-    # },
-)
+# st.set_page_config(
+#     page_title="RocketPy",
+#     page_icon=":rocket:",
+#     layout="wide",
+#     initial_sidebar_state="expanded",
+#     # menu_items={
+#     #     "Get Help": "https://www.extremelycoolapp.com/help",
+#     #     "Report a bug": "https://www.extremelycoolapp.com/bug",
+#     #     "About": "# This is a header. This is an *extremely* cool app!",
+#     # },
+# )
 # os.chdir('../docs/notebooks')
 landing = st.container()
 
