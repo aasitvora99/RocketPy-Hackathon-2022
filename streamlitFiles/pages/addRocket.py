@@ -433,14 +433,16 @@ with rocketTab:
                     #     st.success("Main Chute Added", icon="✅")
 
 st.session_state.rocket = rokit
+env = st.session_state.Env
 st.write(st.session_state.rocket.parachutes[:])
 tf = st.button("simulate")
 if tf:
     st.write(rokit.parachutes[:])
     testFlight = Flight(
-        rocket=st.session_state.rocket,
-        environment=st.session_state.Env,
+        rocket=rokit,
+        environment=env,
         inclination=85,
         heading=0,
     )
+    print(testFlight.allInfo())
     # testFlight.allInfo()
