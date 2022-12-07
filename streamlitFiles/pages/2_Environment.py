@@ -92,14 +92,14 @@ with st.container():
         atmosModel = st.selectbox(
             "Atmospheric Model for Environment Setup",
             (
-                "StandardAtmosphere",
+                "StandardAtmosphere",  # add option to manualy assign wind velocity
                 "WyomingSounding",
                 "NOAARucSounding",
                 "Forecast",
                 "Reanalysis",
                 "Ensemble",
             ),
-            help="SampleText",
+            help="Describes the atmospheric model which is being used. Use Forecast for precise results.",
         )
 
     with col8:
@@ -125,12 +125,14 @@ with st.container():
     st.map(
         df,
         use_container_width=True,
+        zoom=8,
     )
-    # saving object to session state
-    st.session_state.Env = Env
+
     environmentTableDict = dict(Env.allInfoReturned())
     environmentPlotsDict = dict(Env.allPlotInfoReturned())
     if st.button("Run Environment Simulation"):
+        # saving object to session state
+        st.session_state.Env = Env
         col1, col2, col3 = st.columns(3)
 
         with col1:

@@ -14,6 +14,8 @@ st.set_page_config(
     #     "About": "# This is a header. This is an *extremely* cool app!",
     # },
 )
+if "Env" not in st.session_state:
+    st.warning("Go back to environment page and initialize environment")
 
 
 def plotGraph(title, tableDF, yAxis):
