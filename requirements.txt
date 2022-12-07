@@ -113,7 +113,6 @@ qtconsole==5.2.1
 QtPy==1.11.3
 requests==2.26.0
 rich==12.5.1
--e git+ssh://git@github.com/aasitvora99/RocketPy-Hackathon-2022.git@ee37a1b502a3a24151f7ac0279afedd69dda0bbc#egg=rocketpy
 scikit-learn==1.0.1
 scipy==1.7.3
 semver==2.13.0
