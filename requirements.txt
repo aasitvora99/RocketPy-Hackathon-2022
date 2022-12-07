@@ -8,3 +8,4 @@ requests
 pytz
 timezonefinder
 simplekml
+rocketpy==0.11.0
